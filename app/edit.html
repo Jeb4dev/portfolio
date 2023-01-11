@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://semantic-ui.com/javascript/library/jquery.min.js"></script>
+    <script src="https://semantic-ui.com/dist/semantic.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tags.css">
+</head>
+
+<body>
+<div style="margin-top: 50px;" class="ui container">
+    <h1 class="ui center aligned header">Projects</h1>
+
+    <div class="ui form">
+        <div class="field grid">
+            <div class="container">
+                <div class="centered">
+                    <div>
+                        <button class="ui green button" id="form-get-btn">GET</button>
+                        <button class="ui orange button" id="form-send-btn">POST</button>
+                        <button class="ui blue button" id="form-update-btn">PUT</button>
+                        <button class="ui red button" id="form-delete-btn">DELETE</button>
+                        <button class="ui grey button" id="form-clear-btn">CLEAR</button>
+                    </div>
+                    <label for="project-id">Project ID</label>
+                    <input id="project-id" type="number" name="project-id"
+                           placeholder="Project Name" required>
+                    <label for="name">Project Name</label>
+                    <input id="name" type="text" name="name"
+                           placeholder="Project Name" required>
+                    <label for="github">Source Code Link</label>
+                    <input id="github" type="text" name="github"
+                           placeholder="https://github.com/user/repository">
+                    <label for="demo">Demo Link</label>
+                    <input id="demo" type="text" name="demo"
+                           placeholder="https://example.com/project">
+                    <label for="img">Cover Image</label>
+                    <input id="img" type="text" name="img"
+                           placeholder="https://example.com/project.png">
+                    <label for="date">Project Date</label>
+                    <input id="date" type="date" name="date">
+                    <div>
+                        <label for="team">Team Project</label>
+                        <input id="team" type="checkbox" name="team">
+                    </div>
+                    <div>
+                        <label for="score">Project Score</label>
+                        <input id="score" type="range" min="0" max="10" name="score" style="width: 100%">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="api.js" type="application/javascript"></script>
+
+</body>
+
+</html>

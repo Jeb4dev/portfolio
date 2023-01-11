@@ -14,6 +14,7 @@ class Project(Base):
     cover_img = Column(String, nullable=True, default=None)
     created = Column(Date)
     team = Column(Boolean)
+    score = Column(Integer, default=0)
     tags = relationship("Tag", backref="projects")
 
 

@@ -35,47 +35,17 @@ def get_db():
         db.close()
 
 
-# @app.get("/")
-# def home(request: Request, db: Session = Depends(get_db)):
-#     projects = db.query(models.Project).all()
-#     return templates.TemplateResponse("base.html",
-#                                       {"request": request, "projects": projects, "admin": True})
-
-
 @app.get("/")
-@app.post("/")
-def home(request: Request, db: Session = Depends(get_db)):
-    try:
-        name: str = request.query_params["name"]
-    except KeyError:
-        name = ""
-
-    # Query
-    projects = db.query(models.Project).filter(models.Project.name.contains(name)).all()
-
+def home(_: Request, db: Session = Depends(get_db)):
+    projects = db.query(models.Project).all()
     for project in projects:
         project.tags = project.tags
+    return projects
 
-    try:
-        return_projects = []
-        tags: list = request.query_params["tags"].split(",")
 
-        for project in projects:
-            for tag in project.tags:
-                if tag.label in tags:
-                    if project not in return_projects:
-                        return_projects.append(project)
-                    continue
-    except KeyError:
-        return_projects = []
-
-    if len(return_projects) < 1:
-        print("No tags selected")
-        return_projects = projects
-
-    # Return
-    return return_projects
-    # return templates.TemplateResponse("base.html", {"request": request, "projects": return_projects, "admin": False})
+@app.get("/get/{project_id}")
+def home(_: Request, project_id: int, db: Session = Depends(get_db)):
+    return db.query(models.Project).filter(models.Project.id == project_id).first()
 
 
 @app.post("/add")
@@ -88,6 +58,7 @@ def add(
         date: str = Form(...),
         tags: Optional[str] = Form(""),
         team: Optional[bool] = Form(False),
+        score: Optional[int] = Form(False),
         db: Session = Depends(get_db)):
     new_project = models.Project(
         name=name,
@@ -95,7 +66,8 @@ def add(
         demo_url=demo,
         cover_img=img,
         created=datetime.datetime.strptime(date, '%Y-%m-%d').date(),
-        team=team
+        team=team,
+        score=score
     )
     db.add(new_project)
     db.commit()
@@ -123,6 +95,7 @@ def update(
         img: str = Form(...),
         date: str = Form(...),
         tags: str = Form(...),
+        score: str = Form(...),
         db: Session = Depends(get_db)):
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
 
@@ -131,6 +104,7 @@ def update(
     project.github_url = github,
     project.demo_url = demo,
     project.cover_img = img,
+    project.score = score,
     project.created = datetime.datetime.strptime(date, '%Y-%m-%d').date()
 
     # Delete older tags

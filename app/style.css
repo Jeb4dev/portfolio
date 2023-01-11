@@ -18,8 +18,17 @@
 }
 
 label {
-    padding: .5rem;
+    margin: 10rem .5rem .5rem;
 }
+
+input {
+    margin: .5rem .5rem 1rem .5rem !important;
+}
+
+.w100 {
+        width: 100% !important;
+        min-width: 100px;
+    }
 
 @media only screen and (max-width: 584px) {
     .ui.cards > .card {

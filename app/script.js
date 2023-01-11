@@ -5,58 +5,22 @@ let tags = [];
 
 
 async function fetchCards() {
-    console.log('Loading API...');
-    let response = await fetch(`http://127.0.0.1:8000/?name=${name}&tags=${tags}`);
+    let response = await fetch(`http://127.0.0.1:8000/`);
     return await response.json()
 }
 
 async function sort(type) {
-    console.log(filter)
-    if (type === "name-za") {
-        cards.sort(function (a, b) {
-            if (a.name < b.name) {
-                return 1;
-            }
-            if (a.name > b.name) {
-                return -1;
-            }
-            return 0;
-        })
-    } else if (type === "name-az") {
-        cards.sort(function (a, b) {
-            if (a.name < b.name) {
-                return -1;
-            }
-            if (a.name > b.name) {
-                return 1;
-            }
-            return 0;
-        })
-    } else if (type === "date-new") {
-        cards.sort(function (a, b) {
-            if (a.created < b.created) {
-                return 1;
-            }
-            if (a.created > b.created) {
-                return -1;
-            }
-            return 0;
-        })
-    } else if (type === "date-old") {
-        cards.sort(function (a, b) {
-            if (a.created < b.created) {
-                return -1;
-            }
-            if (a.created > b.created) {
-                return 1;
-            }
-            return 0;
-        })
+    const sortMethods = {
+        "name-az": (a, b) => a.name.localeCompare(b.name),
+        "name-za": (a, b) => b.name.localeCompare(a.name),
+        "date-new": (a, b) => a.created < b.created,
+        "date-old": (a, b) => b.created < a.created,
+        "featured": (a, b) => b.score > a.score
     }
-
+    cards.sort(sortMethods[type]);
 }
 
-function buildDom(card, index) {
+function buildCard(card, index) {
     // card container
     const elem = document.createElement('div');
     elem.id = `card-${index}`;
@@ -205,7 +169,7 @@ function buildDom(card, index) {
 
 }
 
-async function buildSite(reload) {
+async function buildCards(reload) {
 
     ///////////////
     // Empty cards
@@ -259,7 +223,7 @@ async function buildSite(reload) {
             // filter tag
 
             if (show) {
-                buildDom(card, index++)
+                buildCard(card, index++)
             }
 
         })
@@ -275,7 +239,7 @@ async function buildSite(reload) {
 }
 
 async function search() {
-    await buildSite(false)
+    await buildCards(false)
     colorTags()
 }
 
@@ -355,4 +319,4 @@ clearBtn.onclick = function () {
 searchBtn.style = "display:none;"
 name = inputName.value
 filter = inputSort.value
-buildSite(true).then()
+buildCards(true).then()
