@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://semantic-ui.com/javascript/library/jquery.min.js"></script>
+    <script src="https://semantic-ui.com/dist/semantic.min.js"></script>
+
+    <style>
+        .ui.cards > .card {
+            width: 271px !important;
+        }
+
+        .ui.button.tags {
+            padding: .3em;
+            margin-bottom: .3em;
+        }
+
+        .tags {
+            padding: .3em;
+            margin: 0 .3em 0 0;
+            background-color: transparent;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-block;
+            min-height: 1em;
+            color: rgba(0, 0, 0, .6);
+            font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            text-transform: none;
+            text-shadow: none;
+            font-weight: 700;
+            line-height: 1em;
+            border-radius: .3rem;
+            text-align: center;
+            outline: #626262 solid 1px;
+        }
+
+        .tags.selected:hover {
+            outline: rgba(0, 109, 128, 1);
+        }
+
+        .tags.selected {
+            background-color: rgba(0, 109, 128, 0.5);
+            outline: rgba(0, 109, 128, 1);
+        }
+
+        .tags.selected:hover {
+            background-color: rgba(0, 109, 128, 1);
+        }
+
+        .Python.selected {
+            background-color: rgba(5, 148, 5, 0.5);
+            outline: transparent;
+        }
+
+        .Python.selected:hover {
+            background-color: rgba(5, 148, 5, 1);
+        }
+
+        .Java.selected {
+            background-color: rgba(255, 255, 0, 0.5);
+            outline: transparent;
+        }
+
+        .Java.selected:hover {
+            background-color: rgb(255, 255, 0);
+        }
+
+        .Bot.selected {
+            background-color: rgba(72, 73, 60, 0.5);
+            outline: transparent;
+        }
+
+        .Bot.selected:hover {
+            background-color: rgba(72, 73, 60, 1);
+        }
+
+        .Discord.selected {
+            background-color: rgba(114, 137, 218, 0.5);
+            outline: transparent;
+        }
+
+        .Discord.selected:hover {
+            background-color: rgba(114, 137, 218, 1);
+        }
+
+        .Web.selected {
+            background-color: rgba(245, 159, 255, 0.5);
+            outline: transparent;
+        }
+
+        .Web.selected:hover {
+            background-color: rgb(245, 159, 255);
+
+        }
+
+        .JS.selected {
+            background-color: rgba(217, 213, 10, 0.5);
+            outline: transparent;
+        }
+
+        .JS.selected:hover {
+            background-color: rgb(217, 213, 10);
+        }
+
+
+    </style>
+
+</head>
+
+<body>
+<div style="margin-top: 50px;" class="ui container">
+    <h1 class="ui center aligned header">Projects</h1>
+
+    {% if admin %}
+
+
+    <form class="ui form" action="/add" method="post">
+        <div class="field">
+            <label for="input-name">Projects</label>
+            <input id="input-name" type="text" name="name" placeholder="Project Name" required><br>
+        </div>
+        <div class="field">
+            <label for="input-github">Github Repository URL</label>
+            <input id="input-github" type="text" name="github" placeholder="Project Github Repository Url"><br>
+        </div>
+        <div class="field">
+            <label for="input-demo">Demo URL</label>
+            <input id="input-demo" type="text" name="demo" placeholder="Project Demo URL"><br>
+        </div>
+        <div class="field">
+            <label for="input-img">Cover Image URL</label>
+            <input id="input-img" type="text" name="img" placeholder="Project Image URL"><br>
+        </div>
+        <div class="field">
+            <label for="input-date">Project Date</label>
+            <input id="input-date" type="date" name="date" required><br>
+        </div>
+        <div class="field">
+            <label for="input-tags">Project Tags</label>
+            <input id="input-tags" type="text" name="tags" placeholder="Project Tags"><br>
+        </div>
+        <div class="field">
+            <label for="input-team">Team Project</label>
+            <input id="input-team" type="checkbox" name="team"><br>
+        </div>
+        <button class="ui blue button" type="submit">Add</button>
+    </form>
+
+    <hr>
+
+    {% endif %}
+
+    <form class="ui form">
+        <div class="field">
+            <label for="search-name">Search by Name</label>
+            <input id="search-name" type="text" name="name" placeholder="project name...">
+            <label for="search-tags"></label>
+            <input id="search-tags" type="text" name="tags" hidden>
+        </div>
+        <button class="ui green button" id="form-search-btn" onclick="event.preventDefault(); search()">Search</button>
+        <button class="ui grey button" id="form-clear-btn" onclick="event.preventDefault(); clearSearch()">Clear
+        </button>
+
+
+    </form>
+
+    <hr>
+
+    <div class="ui column grid cards">
+
+        {% for project in projects %}
+
+        <div class="wide card" id="card-{{project.id}}">
+            <div class="blurring dimmable image">
+                <div class="ui dimmer">
+                    <div class="content">
+                        <div class="center">
+                            {% if project.demo_url != None %}
+                            <a class="ui inverted button" href="{{ project.demo_url }}" target="_blank"
+                               style="margin-bottom: 1.5em">View Demo</a>
+                            {% endif %}
+                            <a class="ui inverted button" href="{{ project.github_url }}" target="_blank">Source
+                                Code</a>
+                        </div>
+                    </div>
+                </div>
+                {% if project.cover_img != None %}
+                <img src="{{ project.cover_img }}" alt="Project Image" style="object-fit:cover; height: 15em; ">
+                {% else %}
+                <img style="background-color: firebrick">
+                {% endif %}
+            </div>
+            <div class="content">
+                <span class="right floated">
+                    {% if project.team %}
+                    <i class="users icon" title="Group Project"></i>
+                    {% else %}
+                    <i class="user icon" title="Solo Project"></i>
+                    {% endif %}
+                </span>
+                <p class="header left aligned">{{ project.name }}</p>
+                <div class="meta left aligned">
+                    <span class="date">Created in {{ project.created.strftime('%B %Y') }}</span>
+                </div>
+            </div>
+
+            <div class="extra content">
+                <div class=" floated">
+                    {% for tag in project.tags %}
+                    <div class="tags {{ tag.label }}" onclick="ToggleTag('{{ tag.label }}')">{{
+                        tag.label }}
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+            {% if admin %}
+            <div class="extra content">
+                <div class="ui two buttons">
+                    <a class="ui blue button" href="/update/{{ project.id }}">Update</a>
+                    <a class="ui red button" href="/delete/{{ project.id }}">Delete</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<script>
+    $('.cards .image').dimmer({
+        on: 'hover'
+    });
+</script>
+
+<script>
+    const inputTag = window.document.getElementById('search-tags');
+    const inputName = window.document.getElementById('search-name');
+    // const searchBtn = window.document.getElementById('form-search-btn');
+
+    let tags = []
+
+    function getTagsFromUrl() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const oldTags = urlParams.get('tags').split(",");
+        inputName.value = urlParams.get('name');
+        tags.push(oldTags);
+        if (tags[0][0] === "") {
+            tags[0][0] = null
+        }
+        tags = tags[0]
+    }
+
+    function search() {
+        tags = tags.filter(item => item);
+        inputTag.value = tags;
+        name = inputName.value;
+        window.location.href = `/?name=${name}&tags=${tags}`;
+    }
+
+    function ToggleTag(tag) {
+        let found = false
+
+        for (let i = 0; i < tags.length; i++) {
+            if (tags[i] === tag) {
+                tags[i] = null
+                found = true
+            }
+        }
+
+        if (!found) {
+            tags.push(tag);
+        }
+
+        search();
+    }
+
+    function clearSearch() {
+        window.location.href = '/?name=&tags='
+    }
+
+    function colorTags() {
+        for (const tag in tags) {
+            tags.forEach(e => {
+                const elements = document.getElementsByClassName(`tags ${e}`)
+                for (let i = 0; i < elements.length; i++) {
+                    elements[i].classList.add("selected")
+                }
+
+            })
+        }
+    }
+
+    getTagsFromUrl()
+    colorTags()
+
+</script>
+</body>
+
+</html>
