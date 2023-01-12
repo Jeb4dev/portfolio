@@ -1,21 +1,19 @@
 import datetime
-from typing import Optional
+import json
+from os import getenv
 
-from fastapi import FastAPI, Depends, Request, Form, status
+from fastapi import FastAPI, Depends, Request, status, HTTPException, Header, Response
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from starlette.responses import RedirectResponse
-from starlette.templating import Jinja2Templates
 
 import models
 from database import SessionLocal, engine
 
+APIKEY = getenv("APIKEY") or "squiresses_fitchy_logic_ditty_afar_signalmen_evohes_sphinx"
+
 models.Base.metadata.create_all(bind=engine)
 
-templates = Jinja2Templates(directory="templates")
-
 app = FastAPI()
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -45,91 +43,115 @@ def home(_: Request, db: Session = Depends(get_db)):
 
 @app.get("/get/{project_id}")
 def home(_: Request, project_id: int, db: Session = Depends(get_db)):
-    return db.query(models.Project).filter(models.Project.id == project_id).first()
+    project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if project:
+        project.tags = project.tags
+        return project
+    raise HTTPException(status_code=404)
 
 
 @app.post("/add")
-def add(
+async def add(
         request: Request,
-        name: str = Form(...),
-        github: Optional[str] = Form(None),
-        demo: Optional[str] = Form(None),
-        img: Optional[str] = Form(None),
-        date: str = Form(...),
-        tags: Optional[str] = Form(""),
-        team: Optional[bool] = Form(False),
-        score: Optional[int] = Form(False),
-        db: Session = Depends(get_db)):
-    new_project = models.Project(
-        name=name,
-        github_url=github,
-        demo_url=demo,
-        cover_img=img,
-        created=datetime.datetime.strptime(date, '%Y-%m-%d').date(),
-        team=team,
-        score=score
-    )
-    db.add(new_project)
-    db.commit()
+        db: Session = Depends(get_db),
+        apikey: str | None = Header(default=None)
+):
+    if apikey == APIKEY:
 
-    for tag in tags.split(", "):
-        new_tag = models.Tag(
-            project_id=new_project.id,
-            label=tag
-        )
-        db.add(new_tag)
+        try:
+            data: dict = json.loads(await request.body())
 
-    db.commit()
+            new_project = models.Project()
 
-    url = app.url_path_for("home")
-    return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
+            # Redefine values
+            new_project.name = data["name"]
+            new_project.github_url = data["github"] or ""
+            new_project.demo_url = data["demo"] or ""
+            new_project.cover_img = data["img"] or "https://placehold.co/100x100/EEE/31343C"
+            new_project.score = int(data["score"]) or 5
+            new_project.team = bool(data["team"]) or False
+            new_project.created = datetime.datetime.strptime(data["date"], '%Y-%m-%d').date()
+
+            db.add(new_project)
+            db.commit()
+
+            # Add new tags
+            for tag in data["tags"].split(", "):
+                new_tag = models.Tag(
+                    project_id=new_project.id,
+                    label=tag
+                )
+                db.add(new_tag)
+
+            # # Commit changes
+            db.commit()
+        except Exception:
+            raise HTTPException(status_code=400)
+
+        return Response(status_code=status.HTTP_201_CREATED)
+    raise HTTPException(status_code=401)
 
 
-@app.get("/update/{project_id}")
-def update(
+@app.put("/update/{project_id}")
+async def update(
         request: Request,
         project_id,
-        name: str = Form(...),
-        github: str = Form(...),
-        demo: str = Form(...),
-        img: str = Form(...),
-        date: str = Form(...),
-        tags: str = Form(...),
-        score: str = Form(...),
-        db: Session = Depends(get_db)):
-    project = db.query(models.Project).filter(models.Project.id == project_id).first()
+        db: Session = Depends(get_db),
+        apikey: str | None = Header(default=None)
+):
+    if apikey == APIKEY:
+        try:
+            data: dict = json.loads(await request.body())
+            project = db.query(models.Project).filter(models.Project.id == project_id).first()
+            if not project:
+                raise HTTPException(status_code=404)
 
-    # Redefine values
-    project.name = name,
-    project.github_url = github,
-    project.demo_url = demo,
-    project.cover_img = img,
-    project.score = score,
-    project.created = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+            # Redefine values
+            project.name = data["name"] or "DEFAULT NAME"
+            project.github_url = data["github"] or ""
+            project.demo_url = data["demo"] or ""
+            project.cover_img = data["img"] or "https://placehold.co/100x100/EEE/31343C"
+            project.score = int(data["score"]) or 5
+            project.team = bool(data["team"]) or False
+            project.created = datetime.datetime.strptime(data["date"], '%Y-%m-%d').date()
 
-    # Delete older tags
-    db.query(models.Tag).filter(models.Tag.project_id == project_id).delete()
+            # Delete older tags
+            db.query(models.Tag).filter(models.Tag.project_id == project_id).delete()
 
-    # Add new tags
-    for tag in tags.split(", "):
-        new_tag = models.Tag(
-            project_id=project.id,
-            label=tag
-        )
-        db.add(new_tag)
+            db.add(project)
+            db.commit()
 
-    # Commit changes
-    db.commit()
+            # Add new tags
+            for tag in data["tags"].split(", "):
+                new_tag = models.Tag(
+                    project_id=project.id,
+                    label=tag
+                )
+                db.add(new_tag)
 
-    url = app.url_path_for("home")
-    return RedirectResponse(url=url, status_code=status.HTTP_302_FOUND)
+            # # Commit changes
+            db.commit()
+        except Exception:
+            raise HTTPException(status_code=400)
+
+        return Response(status_code=status.HTTP_302_FOUND)
+
+    raise HTTPException(status_code=401)
 
 
-@app.get("/delete/{project_id}")
-def delete(request: Request, project_id: int, db: Session = Depends(get_db)):
-    project = db.query(models.Project).filter(models.Project.id == project_id).first()
-    db.delete(project)
-    db.commit()
+@app.delete("/delete/{project_id}")
+def delete(_: Request,
+           project_id: int,
+           db: Session = Depends(get_db),
+           apikey: str | None = Header(default=None)
+           ):
+    print(apikey)
+    if apikey == APIKEY:
+        project = db.query(models.Project).filter(models.Project.id == project_id).first()
+        if project is None:
+            raise HTTPException(status_code=404)
 
-    url = app.url_path_for("home")
-    return RedirectResponse(url=url, status_code=status.HTTP_302_FOUND)
+        db.delete(project)
+        db.commit()
+        return Response(status_code=status.HTTP_200_OK)
+    raise HTTPException(status_code=401)
