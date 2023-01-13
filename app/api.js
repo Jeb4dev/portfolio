@@ -1,6 +1,8 @@
 let cardID
 let data = {}
 
+let apikey = null;
+
 const formProjectID = window.document.getElementById('project-id');
 const formName = window.document.getElementById('name');
 const formGithub = window.document.getElementById('github');
@@ -19,21 +21,9 @@ function setCookie(cname, cvalue, exdays) {
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-function getCookie(cname) {
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) === ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) === 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
+const getCookieValue = (name) => (
+    document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
+)
 
 
 async function getFormDate() {
@@ -52,14 +42,18 @@ async function getFormDate() {
 
 async function fetchCards(type) {
     await getFormDate()
-    const apikey = getCookie("apikey");
+
     let response = "";
 
     // fetch api
-    if (apikey !== "") {
+    if (type !== "GET") {
+
+        if (apikey === null) {
+            apikey = window.prompt("apikey", "Insert API key here");
+        }
 
         // UPDATE
-        if (type === "PUT") {
+        if (type === "PUT" && apikey !== null) {
             response = await fetch(`http://127.0.0.1:8000/update/${cardID}`, {
                 method: 'PUT',
                 mode: 'cors',
@@ -72,7 +66,7 @@ async function fetchCards(type) {
             });
         }
         // DELETE
-        if (type === "DELETE") {
+        if (type === "DELETE" && apikey !== null) {
             response = await fetch(`http://127.0.0.1:8000/delete/${cardID}`, {
                 method: 'DELETE',
                 mode: 'cors',
@@ -84,7 +78,7 @@ async function fetchCards(type) {
             });
         }
         // ADD
-        if (type === "POST") {
+        if (type === "POST" && apikey !== null) {
             response = await fetch(`http://127.0.0.1:8000/add`, {
                 method: 'POST',
                 mode: 'cors',
