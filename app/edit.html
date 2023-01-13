@@ -30,7 +30,7 @@
                     </div>
                     <label for="project-id">Project ID</label>
                     <input id="project-id" type="number" name="project-id"
-                           placeholder="Project Name" required>
+                           placeholder="Project Identifier" required>
                     <label for="name">Project Name</label>
                     <input id="name" type="text" name="name"
                            placeholder="Project Name" required>
@@ -43,8 +43,11 @@
                     <label for="img">Cover Image</label>
                     <input id="img" type="text" name="img"
                            placeholder="https://example.com/project.png">
+                    <label for="tags">Project Tags</label>
+                    <input id="tags" type="text" name="tags"
+                           placeholder="Python, Web, Docker...">
                     <label for="date">Project Date</label>
-                    <input id="date" type="date" name="date">
+                    <input id="date" type="date" name="date" required>
                     <div>
                         <label for="team">Team Project</label>
                         <input id="team" type="checkbox" name="team">
