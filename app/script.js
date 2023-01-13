@@ -247,6 +247,11 @@ async function clear() {
     inputName.value = ''
     name = ''
     tags = []
+    let searchbar = window.document.getElementsByClassName('searchbar')
+    for (let i = 0; i < searchbar.length; i++) {
+        searchbar[i].style = "";
+        searchbar[i].classList.remove("selected")
+    }
     await search()
     colorTags()
 }
