@@ -5,7 +5,7 @@ let tags = [];
 
 
 async function fetchCards() {
-    let response = await fetch(`http://127.0.0.1:8000/`);
+    let response = await fetch(`${window.location.href}api`);
     return await response.json()
 }
 
