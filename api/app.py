@@ -34,6 +34,7 @@ def get_db():
 
 
 @app.get("/")
+@app.get("/api")
 def home(_: Request, db: Session = Depends(get_db)):
     projects = db.query(models.Project).all()
     for project in projects:
@@ -42,6 +43,7 @@ def home(_: Request, db: Session = Depends(get_db)):
 
 
 @app.get("/get/{project_id}")
+@app.get("/api/get/{project_id}")
 def home(_: Request, project_id: int, db: Session = Depends(get_db)):
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
     if project:
@@ -51,6 +53,7 @@ def home(_: Request, project_id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/add")
+@app.post("/api/add")
 async def add(
         request: Request,
         db: Session = Depends(get_db),
@@ -93,6 +96,7 @@ async def add(
 
 
 @app.put("/update/{project_id}")
+@app.put("/api/update/{project_id}")
 async def update(
         request: Request,
         project_id,
@@ -140,12 +144,12 @@ async def update(
 
 
 @app.delete("/delete/{project_id}")
+@app.delete("/api/delete/{project_id}")
 def delete(_: Request,
            project_id: int,
            db: Session = Depends(get_db),
            apikey: str | None = Header(default=None)
            ):
-    print(apikey)
     if apikey == APIKEY:
         project = db.query(models.Project).filter(models.Project.id == project_id).first()
         if project is None:
