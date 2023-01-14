@@ -54,7 +54,7 @@ async function fetchCards(type) {
 
         // UPDATE
         if (type === "PUT" && apikey !== null) {
-            response = await fetch(`http://127.0.0.1:8000/update/${cardID}`, {
+            response = await fetch(`${location.protocol + '//' + location.host}/api/update/${cardID}`, {
                 method: 'PUT',
                 mode: 'cors',
                 cache: 'no-cache',
@@ -67,7 +67,7 @@ async function fetchCards(type) {
         }
         // DELETE
         if (type === "DELETE" && apikey !== null) {
-            response = await fetch(`http://127.0.0.1:8000/delete/${cardID}`, {
+            response = await fetch(`${location.protocol + '//' + location.host}/api/delete/${cardID}`, {
                 method: 'DELETE',
                 mode: 'cors',
                 cache: 'no-cache',
@@ -79,7 +79,7 @@ async function fetchCards(type) {
         }
         // ADD
         if (type === "POST" && apikey !== null) {
-            response = await fetch(`http://127.0.0.1:8000/add`, {
+            response = await fetch(`${location.protocol + '//' + location.host}/api/add`, {
                 method: 'POST',
                 mode: 'cors',
                 cache: 'no-cache',
@@ -94,7 +94,7 @@ async function fetchCards(type) {
 
     // GET
     if (type === "GET") {
-        response = await fetch(`http://127.0.0.1:8000/get/${cardID}`);
+        response = await fetch(`${location.protocol + '//' + location.host}/api/get/${cardID}`);
     }
 
     // Notify response status
