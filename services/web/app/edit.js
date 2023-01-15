@@ -33,7 +33,7 @@ async function getFormDate() {
         "demo": formDemo.value,
         "img": formImg.value,
         "date": formDate.value,
-        "team": formTeam.value,
+        "team": formTeam.checked,
         "tags": formTags.value,
         "score": formScore.value
     }
@@ -118,7 +118,7 @@ async function clear() {
     formDemo.value = ""
     formImg.value = ""
     formDate.value = ""
-    formTeam.value = ""
+    formTeam.checked = false
     formTags.value = ""
     formScore.value = ""
 }
@@ -141,7 +141,11 @@ btnGet.onclick = function () {
                     formDemo.value = e.demo_url
                     formImg.value = e.cover_img
                     formDate.value = e.created
-                    formTeam.value = e.team
+                    if (e.team === true) {
+                        formTeam.checked = true;
+                    } else {
+                        formTeam.checked = false;
+                    }
                     const _tags = []
                     e.tags.forEach(tag => {
                         _tags.push(tag.label)
