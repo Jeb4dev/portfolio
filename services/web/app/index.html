@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://semantic-ui.com/javascript/library/jquery.min.js"></script>
+    <script src="https://semantic-ui.com/dist/semantic.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tags.css">
+</head>
+
+<body>
+<div style="margin-top: 50px;" class="ui container">
+    <h1 class="ui center aligned header">Projects</h1>
+
+    <div class="ui form">
+        <div class="field grid">
+            <div class="container">
+                <div class="w70">
+                    <label for="search-name">Search</label>
+                    <input id="search-name" type="text" name="name"
+                           placeholder="Search by project name...">
+                </div>
+                <div class="w30">
+                    <label for="select-sort">Sort:</label>
+                    <select id="select-sort">
+                        <option value="featured" selected>Featured</option>
+                        <option value="date-new">Newest first</option>
+                        <option value="date-old">Oldest first</option>
+                        <option value="name-az">A-Z</option>
+                        <option value="name-za">Z-A</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <button class="ui green button" id="form-search-btn">Search</button>
+        <button class="ui searchbar grey button" id="form-clear-btn">Clear</button>
+        <div class="tags searchbar Web" onclick="ToggleTag('Web')">Web</div>
+        <div class="tags searchbar Python" onclick="ToggleTag('Python')">Python</div>
+        <div class="tags searchbar JS" onclick="ToggleTag('JS')">JavaScript</div>
+        <div class="tags searchbar Game" onclick="ToggleTag('Game')">Game</div>
+    </div>
+
+    <hr>
+
+    <div class="ui column grid cards" id="cardContainer">
+
+        <p id="loading-projects">Loading Projects ...</p>
+
+    </div>
+</div>
+
+<script src="script.js" type="application/javascript"></script>
+
+</body>
+
+</html>

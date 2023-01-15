@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+
+  api:
+    build: ./services/api
+    command: uvicorn app:app --host 0.0.0.0 --port 5555 --app-dir app --workers 1 --limit-concurrency 32
+    volumes:
+      - ./services/api/:/usr/src/app/
+    # ports:
+    # Api is not exposed for internet, only docker network can access it via port 5555
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - db
+    container_name: api
+    restart: always
+
+  web:
+    image: img-static-site-example
+    build:
+      context: ./services/web
+      dockerfile: Dockerfile.prod
+    volumes:
+      - logs:/var/log/nginx/
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    container_name: web
+    restart: always
+
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=portfolio
+      - POSTGRES_PASSWORD=portfolio
+      - POSTGRES_DB=portfolio_dev
+    container_name: postgresql
+    restart: always
+
+volumes:
+  postgres_data_prod:
+  logs:
